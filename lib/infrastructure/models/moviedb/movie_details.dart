@@ -129,7 +129,7 @@ class MovieDetailsResponse {
 class BelongsToCollection {
   final int id;
   final String name;
-  final String posterPath;
+  final String? posterPath;
   final String? backdropPath;
 
   BelongsToCollection({
