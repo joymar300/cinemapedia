@@ -1,6 +1,7 @@
 import 'package:cinemapedia/domain/repositories/movies_repository.dart';
 import 'package:cinemapedia/presentation/delegates/search_movie_movie.dart';
 import 'package:cinemapedia/presentation/screens/providers/movies/movies_repository_provider.dart';
+import 'package:cinemapedia/presentation/screens/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,14 +30,21 @@ class CustomAppBar extends ConsumerWidget {
                     const Spacer(),
                     IconButton(
                         onPressed: () {
-                          final movieRepository =
-                              ref.read(movieRepositoryProvider);
+                          final searchedMovies = ref.read(searchMoviesProvider);
+                          final searchquery = ref.read(searchQueryProvider);
                           showSearch<Movie?>(
-                                  context: context,
-                                  delegate: SearchMovieDelegate(
-                                      searchMovies:
-                                          movieRepository.searchMovies))
-                              .then((movie) {
+                              query: searchquery,
+                              context: context,
+                              delegate: SearchMovieDelegate(
+                                  initailMovies: searchedMovies,
+                                  searchMovies: (query) {
+                                    ref
+                                        .read(searchQueryProvider.notifier)
+                                        .update((state) => query);
+                                    return ref
+                                        .read(searchMoviesProvider.notifier)
+                                        .searchMoviesByQuery(query);
+                                  })).then((movie) {
                             if (movie == null) return;
                             context.push('/movie/${movie.id}');
                           });
